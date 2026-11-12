@@ -1,72 +1,75 @@
-# E-Waste Collection and Recycling Credit Engine
+# ECE-055: Electronics E-Waste Collection and Recycling Credit Engine
 
-This repository currently contains **learning demos and design notes**, not the official capstone submission. The demos help us understand how the recycler records sources, calculates credits and charges, and schedules accepted pickups into vehicle days. The assignment calls for a command-line program driven by files, so a front end or website is not required.
+This repository contains the work for the ECE-055 engineering capstone. The project models how an authorised recycler can process collection requests from households and bulk sources, calculate recycling credits or amounts payable, and assign accepted pickups to vehicle days.
 
-## What we have understood
+The project is a command-line application. It reads source, rate-card, request, and item data from CSV files by following a `commands.txt` file. It has no graphical interface or database.
 
-- A source is a registered pickup location, with a type (`HOUSEHOLD` or `BULK`) and distance from the depot.
-- A pickup request has item lines with a category, item count, and total line weight.
-- The engine calculates category credit, household BATTERY/CRT handling deductions, and any pickup charge.
-- A household request under 5 kg is refused. A request at exactly 5 kg meets the minimum.
-- Accepted requests are placed in request order on the earliest vehicle day that fits all three limits: 1,200 kg total, 8 stops, and 300 kg hazardous material.
-- A shared neighborhood collection point is a proposed way to combine contributions from nearby homes into one household request. The combined request must meet 5 kg before it is sent to the engine. Separate requests below 5 kg still follow the refusal rule. Ask the instructor whether a community point can be registered as a `HOUSEHOLD` source.
-- Positive net amounts are credits to the source; negative net amounts are amounts payable by the source. A source collecting 500 kg or more in the month qualifies for a recycling certificate line.
+## Understanding the project
 
-## Demo data and outputs
+Think of the engine as a small operations desk. It receives a list of registered collection sources and pickup requests. For each request, it totals item weights, checks source-specific eligibility, calculates the financial result, and looks for the earliest vehicle day with enough room. The vehicle must satisfy the weight, stop-count, and hazardous-material limits at the same time.
 
-The data and rate values in both demo sets are illustrative. Replace them with instructor-provided data and rates when available.
+For example, a household request can include a computer, cable, and battery. The engine looks up the rate-card value and hazard flag for each category, totals the request weight, applies the household hazardous-material deduction to the battery, calculates any distance charge, and then schedules the complete request if a vehicle day can accept it. A request is never split between vehicle days.
 
-### Original small demo
+## Repository layout
 
-- `prototype.py` with `demo_data/` is the first, smaller teaching example.
-- Run it with `python prototype.py`.
-- See `PROTOTYPE_README.md` for its examples and code map.
+| Folder or file | Purpose |
+| --- | --- |
+| `e_waste_engine/` | Actual capstone implementation, currently at Phase 2 (loading, calculations, refusals, and scheduling). |
+| `e_waste_engine/README.md` | Run instructions for the current engine. |
+| `e_waste_engine/phase_2_guide.md` | Learning guide with file roles, rule flow, and code landmarks. |
+| `learning_demo/` | Earlier learning implementation that writes example CSV reports. Keep it separate from the actual engine. |
+| `E030-ECE-055-sample-data/` | Instructor-provided input pack. The nested folder contains the CSVs, command file, and pack README. |
+| `.gitignore` | Excludes Python bytecode and virtual-environment folders from Git. |
 
-### Community collection demo
+The sample pack is retained as supplied and is read-only input for these programs. The two Python implementations are separate so the learning demo is not confused with the phased capstone implementation.
 
-`community_demo/` has 15 sources (9 shared household collection points across 3 areas and 6 bulk locations), 20 requests, and a visible expected report for the first 15 requests.
+## Business rules
 
-From the project root, run the readable, name-based report for the visible 15:
+These are the rules implemented or planned from the project brief and sample-pack conventions:
 
-```powershell
-python main.py --sources community_demo/sources.csv --rates community_demo/rates.csv --requests community_demo/requests_visible.csv --friendly
-```
+| ID | Rule |
+| --- | --- |
+| BR-01 | Category credit is item weight multiplied by that category's rate-card value. |
+| BR-02 | For HOUSEHOLD requests, hazardous categories BATTERY and CRT receive a Rs 15/kg handling deduction instead of a rate-card credit. BULK sources receive the normal rate-card credit for hazardous items. |
+| BR-03 | Pickup is free through 10 km. Beyond 10 km, distance is rounded up to a whole kilometre and charged at Rs 12 per kilometre above 10 km. The charge is waived for requests of at least 200 kg. |
+| BR-04 | A HOUSEHOLD request below 5 kg is refused as `BELOW_MINIMUM`; exactly 5 kg is eligible. BULK has no minimum. |
+| BR-05 | Requests are processed in input order and considered from the day after the request date. Vehicle days are Monday to Saturday. |
+| BR-06 | Each vehicle day can hold at most 1,200 kg and 8 stops. A request is assigned whole to the earliest day where it fits. |
+| BR-07 | Hazardous material is limited to 300 kg per vehicle day. Weight, stop count, and hazard room are checked together before assignment. A request with over 300 kg hazardous material is refused as `HAZARD_OVER_LIMIT`. |
+| BR-08 | A request with total weight over 1,200 kg is refused as `OVER_CAPACITY`. |
+| BR-09 | Net amount is credits minus deductions and pickup charge, rounded half up to whole rupees. A negative result is represented as `AMOUNT_PAYABLE` by the source. |
+| BR-10 | A source collecting at least 500 kg during a month receives a `RECYCLING_CERTIFICATE` line in that month's summary. |
 
-The five holdout requests are **not operating-system hidden files**. They are rows `R016` through `R020` in `community_demo/requests.csv`. Their expected answers are omitted from the visible expected-output files so you can try them. Run the full dataset to display their results:
+## Current status
 
-```powershell
-python main.py --sources community_demo/sources.csv --rates community_demo/rates.csv --requests community_demo/requests.csv --friendly
-```
+The actual engine is at **Phase 2**. It loads the sample pack, links request item rows to requests, calculates credits/deductions/charges, applies refusal conditions, and schedules accepted requests into one vehicle's days. It prints a compact processing summary.
 
-See `community_demo/README.md` for the data columns, output meaning, and compact report option. `expected_visible_output.txt` is the compact output; `friendly_expected_output.txt` shows full source names with labeled values.
+Phase 3 will add the required credit-note, pickup-schedule, and monthly-summary report files. Phase 4 will compare those files against the official expected outputs when they are provided, address discrepancies, and prepare final submission documentation. The current sample pack does not include official expected-output files, so current run totals are not a claim of matching hidden evaluation results.
 
-## Project files
+The separate `learning_demo/` can generate example output CSVs, but those are demo results and are not official expected answers. Its own README explains how to run it.
 
-- `main.py` — CLI entry point for the CSV-based engine.
-- `ewaste_engine/` — data models, input validation, rule calculations, scheduling, and reports.
-- `demo_data/` — inputs for the original small demo.
-- `community_demo/` — larger proposed community collection demo and visible expected output.
-- `docs/DESIGN.md` — numbered business rules, data model, flow, and unresolved decisions.
-- `tests/test_engine.py` — seven rule-level checks for the modular demo engine.
-- `Documents and Learning/` — teammate-friendly Word learning brief and the script that builds it.
+## Run the actual engine
 
-## What to confirm before building the official version
-
-1. Ask whether residential hubs may be represented as `HOUSEHOLD` sources and how credits should be issued for pooled household contributions.
-2. Confirm the instructor's source, rate-card, request files, expected output format, rounding convention, and distance-rounding interpretation.
-3. Confirm how a whole request above a daily weight or hazard limit should be handled; the demos refuse such requests with explanatory reasons.
-4. Continue learning the code and keep a decision log before treating any demo code as submitted work.
-
-## Update GitHub after local changes
-
-From PowerShell in the project folder:
+Use Python 3.10 or later. Open PowerShell in the repository root and run:
 
 ```powershell
-git status
-git add .
-git status
-git commit -m "Describe the update"
-git push
+python -m e_waste_engine.main
 ```
 
-Review the second `git status` before committing. Replace the example commit message with a short description of what changed.
+The default command path points to the supplied sample pack. To choose another command file:
+
+```powershell
+python -m e_waste_engine.main --commands "path/to/commands.txt"
+```
+
+The command file determines which CSVs are loaded and when requests are processed. The engine prints loading progress, scheduled/refused totals, vehicle-day count, and a highest-load-day snapshot. At this phase it does not write the three final report files yet.
+
+## Suggested study order
+
+1. Read this README and the support pack README to understand the requirements and input format.
+2. Read `e_waste_engine/models.py` to see the records passed between modules.
+3. Read `e_waste_engine/main.py` to follow command parsing and CSV loading.
+4. Read `e_waste_engine/engine.py` to follow money calculations and scheduling decisions.
+5. Use `e_waste_engine/phase_2_guide.md` as a map to the important functions.
+
+The learning demo is a separate implementation with its own [README](learning_demo/README.md), generated report examples, and suggested reading order.

@@ -1,0 +1,6 @@
+category,credit_per_kg_rs,hazardous
+IT,18.00,false
+CONSUMER,12.00,false
+BATTERY,25.00,true
+CABLE,30.00,false
+CRT,4.00,true

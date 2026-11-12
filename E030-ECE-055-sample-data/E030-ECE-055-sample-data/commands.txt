@@ -1,0 +1,9 @@
+# ECE-055 command file - load masters and requests, process requests in request order, then print
+LOAD_SOURCES|sources.csv
+LOAD_RATE_CARD|rate_card.csv
+LOAD_REQUESTS|requests.csv
+LOAD_REQUEST_ITEMS|request_items.csv
+PROCESS_REQUESTS
+PRINT_CREDIT_NOTES
+PRINT_SCHEDULE
+MONTHLY_SUMMARY|2026-10

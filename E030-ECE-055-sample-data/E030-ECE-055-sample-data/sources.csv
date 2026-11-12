@@ -1,0 +1,21 @@
+source_id,source_name,source_type,area,distance_km,contact_mobile
+SRC-01,Manipal Hospital Old Airport Road,BULK,Kengeri,25.7,8002978753
+SRC-02,BMS College of Engineering,BULK,Koramangala,18.9,9787680457
+SRC-03,Bosch Adugodi Plant,BULK,Marathahalli,23.6,6784726714
+SRC-04,Prestige Tech Park Facilities,BULK,Malleshwaram,25.3,8136270107
+SRC-05,Infosys Electronic City Campus,BULK,Yelahanka,24.8,6933190845
+SRC-06,Atria Institute of Technology,BULK,Hebbal,20.0,6599728379
+SRC-07,Suresh Iyer,HOUSEHOLD,JP Nagar,10.0,8162294866
+SRC-08,Priya Kulkarni,HOUSEHOLD,Marathahalli,26.7,7836016105
+SRC-09,Mahesh Hegde,HOUSEHOLD,Hebbal,22.7,8008754751
+SRC-10,Shilpa Menon,HOUSEHOLD,Malleshwaram,13.1,9992298369
+SRC-11,Rohit Naik,HOUSEHOLD,HSR Layout,32.0,9931860320
+SRC-12,Nandini Desai,HOUSEHOLD,Hebbal,5.6,6737028382
+SRC-13,Priya Pillai,HOUSEHOLD,JP Nagar,10.1,7646861642
+SRC-14,Kavya Menon,HOUSEHOLD,HSR Layout,13.5,7477647258
+SRC-15,Tejaswini Rao,HOUSEHOLD,Malleshwaram,28.8,9188413301
+SRC-16,Ashwini Patil,HOUSEHOLD,Malleshwaram,15.3,8682052589
+SRC-17,Jyothi Kulkarni,HOUSEHOLD,Marathahalli,10.5,7194893949
+SRC-18,Anil Shetty,HOUSEHOLD,Koramangala,17.9,7141621052
+SRC-19,Nitin Patil,HOUSEHOLD,Hebbal,25.2,6854914524
+SRC-20,Nitin Bhat,HOUSEHOLD,Koramangala,28.7,6064600130
