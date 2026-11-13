@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .engine import process
 from .models import Item, Rate, Request, Source
+from .reports import write_credit_notes, write_monthly_summary, write_schedule
 
 
 class InputProblem(Exception):
@@ -130,7 +131,8 @@ def main():
     pack_dir = command_file.parent
     sources = rates = requests = results = days = None
     report_commands_seen = False
-    print("ECE-055 E-WASTE ENGINE | PHASE 2")
+    print("ECE-055 E-WASTE ENGINE | PHASE 3")
+    output_dir = command_file.parent / "output"
     try:
         for line_no, raw in enumerate(command_file.read_text(encoding="utf-8-sig").splitlines(), 1):
             line = raw.strip()
@@ -159,16 +161,31 @@ def main():
                     raise InputProblem("Load all four input files before processing")
                 results, days = process(requests, sources, rates)
                 print_processing_summary(results, days)
-            elif command in {"PRINT_CREDIT_NOTES", "PRINT_SCHEDULE", "MONTHLY_SUMMARY"}:
-                report_commands_seen = True
+            elif command == "PRINT_CREDIT_NOTES" and not arg:
+                if results is None:
+                    raise InputProblem("Run PROCESS_REQUESTS before printing reports")
+                write_credit_notes(output_dir / "credit_notes.csv", results)
+                print("Created report: output/credit_notes.csv")
+            elif command == "PRINT_SCHEDULE" and not arg:
+                if results is None:
+                    raise InputProblem("Run PROCESS_REQUESTS before printing reports")
+                write_schedule(output_dir / "pickup_schedule.csv", results, days)
+                print("Created report: output/pickup_schedule.csv")
+            elif command == "MONTHLY_SUMMARY" and len(arg) == 1:
+                if results is None or sources is None:
+                    raise InputProblem("Run PROCESS_REQUESTS before printing reports")
+                try:
+                    date.fromisoformat(arg[0] + "-01")
+                except ValueError as exc:
+                    raise InputProblem("MONTHLY_SUMMARY expects a month in YYYY-MM format") from exc
+                write_monthly_summary(output_dir / "monthly_summary.csv", arg[0], results, sources)
+                print("Created report: output/monthly_summary.csv")
             else:
                 raise InputProblem(f"commands.txt, line {line_no}: unknown command or wrong arguments")
     except (OSError, InputProblem, KeyError, IndexError) as exc:
         print(f"\nINPUT ERROR\n{exc}")
         return 2
-    if report_commands_seen:
-        print("Report-file generation is reserved for Phase 3.")
-    print("Phase 2 complete.")
+    print("Phase 3 complete. Reports are in the sample pack's output folder.")
     return 0
 
 
