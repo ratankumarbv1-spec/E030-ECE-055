@@ -1,75 +1,106 @@
 # ECE-055: Electronics E-Waste Collection and Recycling Credit Engine
 
-This repository contains the work for the ECE-055 engineering capstone. The project models how an authorised recycler can process collection requests from households and bulk sources, calculate recycling credits or amounts payable, and assign accepted pickups to vehicle days.
+An educational command-line project that models how an authorised recycler registers sources, prices e-waste pickups, schedules a vehicle, and prepares credit notes and monthly reports. It uses Python 3.10+ and CSV files; there is no web interface or database.
 
-The project is a command-line application. It reads source, rate-card, request, and item data from CSV files by following a `commands.txt` file. It has no graphical interface or database.
+## What the project does
 
-## Understanding the project
+Treat it as a small operations desk. The input files describe collection sources, category rates, pickup requests, and the item lines in each request. The engine connects those records, totals the weights, decides whether each request is eligible, calculates money, and schedules accepted requests into a vehicle day. It then writes three CSV reports.
 
-Think of the engine as a small operations desk. It receives a list of registered collection sources and pickup requests. For each request, it totals item weights, checks source-specific eligibility, calculates the financial result, and looks for the earliest vehicle day with enough room. The vehicle must satisfy the weight, stop-count, and hazardous-material limits at the same time.
-
-For example, a household request can include a computer, cable, and battery. The engine looks up the rate-card value and hazard flag for each category, totals the request weight, applies the household hazardous-material deduction to the battery, calculates any distance charge, and then schedules the complete request if a vehicle day can accept it. A request is never split between vehicle days.
-
-## Repository layout
-
-| Folder or file | Purpose |
-| --- | --- |
-| `e_waste_engine/` | Actual capstone implementation, currently at Phase 2 (loading, calculations, refusals, and scheduling). |
-| `e_waste_engine/README.md` | Run instructions for the current engine. |
-| `e_waste_engine/phase_2_guide.md` | Learning guide with file roles, rule flow, and code landmarks. |
-| `learning_demo/` | Earlier learning implementation that writes example CSV reports. Keep it separate from the actual engine. |
-| `E030-ECE-055-sample-data/` | Instructor-provided input pack. The nested folder contains the CSVs, command file, and pack README. |
-| `.gitignore` | Excludes Python bytecode and virtual-environment folders from Git. |
-
-The sample pack is retained as supplied and is read-only input for these programs. The two Python implementations are separate so the learning demo is not confused with the phased capstone implementation.
+For example, suppose a household request contains a computer, cable, and battery. The engine looks up the rate and hazard flag for each category, totals all item weights, gives normal rate-card credit for non-hazardous items, and applies the hazardous handling deduction to the household battery. It calculates any pickup charge, then searches for the earliest eligible vehicle day. The complete request must fit the day’s stop, weight, and hazardous-weight limits together; requests are not split across days.
 
 ## Business rules
 
-These are the rules implemented or planned from the project brief and sample-pack conventions:
-
 | ID | Rule |
 | --- | --- |
-| BR-01 | Category credit is item weight multiplied by that category's rate-card value. |
-| BR-02 | For HOUSEHOLD requests, hazardous categories BATTERY and CRT receive a Rs 15/kg handling deduction instead of a rate-card credit. BULK sources receive the normal rate-card credit for hazardous items. |
-| BR-03 | Pickup is free through 10 km. Beyond 10 km, distance is rounded up to a whole kilometre and charged at Rs 12 per kilometre above 10 km. The charge is waived for requests of at least 200 kg. |
-| BR-04 | A HOUSEHOLD request below 5 kg is refused as `BELOW_MINIMUM`; exactly 5 kg is eligible. BULK has no minimum. |
-| BR-05 | Requests are processed in input order and considered from the day after the request date. Vehicle days are Monday to Saturday. |
-| BR-06 | Each vehicle day can hold at most 1,200 kg and 8 stops. A request is assigned whole to the earliest day where it fits. |
-| BR-07 | Hazardous material is limited to 300 kg per vehicle day. Weight, stop count, and hazard room are checked together before assignment. A request with over 300 kg hazardous material is refused as `HAZARD_OVER_LIMIT`. |
-| BR-08 | A request with total weight over 1,200 kg is refused as `OVER_CAPACITY`. |
-| BR-09 | Net amount is credits minus deductions and pickup charge, rounded half up to whole rupees. A negative result is represented as `AMOUNT_PAYABLE` by the source. |
-| BR-10 | A source collecting at least 500 kg during a month receives a `RECYCLING_CERTIFICATE` line in that month's summary. |
+| BR-01 | Category credit is item weight × category rate. Item-line credit is rounded to two decimal places. |
+| BR-02 | For HOUSEHOLD sources, hazardous BATTERY and CRT items get a Rs 15/kg handling deduction instead of rate-card credit. BULK sources receive rate-card credit for hazardous items. |
+| BR-03 | Pickup is free up to and including 10 km. Beyond 10 km, distance is rounded up to a whole kilometre and charged Rs 12 for each kilometre beyond 10. The charge is waived when request weight is at least 200 kg. |
+| BR-04 | HOUSEHOLD requests below 5 kg are refused as `BELOW_MINIMUM`; exactly 5 kg is eligible. BULK has no minimum. |
+| BR-05 | Process requests in input order. Each is tried starting the day after its request date. Vehicle days are Monday–Saturday; Sunday is skipped. |
+| BR-06 | One vehicle day allows up to 1,200 kg and 8 stops. An accepted request is assigned whole to the earliest day that fits. |
+| BR-07 | Hazardous items are limited to 300 kg per vehicle day. Stop count, total weight, and hazardous weight must all fit at once. A request with more than 300 kg hazardous weight is refused as `HAZARD_OVER_LIMIT`. |
+| BR-08 | A request weighing more than 1,200 kg is refused as `OVER_CAPACITY`. |
+| BR-09 | Net = credits − deductions − pickup charge, rounded half up to whole rupees. A negative net is shown as a positive amount with `net_type=AMOUNT_PAYABLE`. |
+| BR-10 | A source collecting at least 500 kg in the requested month receives `RECYCLING_CERTIFICATE` in the monthly summary. |
 
-## Current status
+## Repository map
 
-The actual engine is at **Phase 2**. It loads the sample pack, links request item rows to requests, calculates credits/deductions/charges, applies refusal conditions, and schedules accepted requests into one vehicle's days. It prints a compact processing summary.
+| Path | Role |
+| --- | --- |
+| `e_waste_engine/` | Actual capstone implementation. |
+| `e_waste_engine/main.py` | Reads `commands.txt`, loads CSVs, calls the engine, and writes reports when report commands occur. |
+| `e_waste_engine/models.py` | Defines the Source, Rate, Item, Request, VehicleDay, and Result records. |
+| `e_waste_engine/engine.py` | Calculates money and hazardous weight; applies refusal rules; schedules requests. |
+| `e_waste_engine/reports.py` | Writes credit notes, pickup schedule, and monthly summary CSVs. |
+| `e_waste_engine/phase_2_guide.md` | Additional code walkthrough and key code landmarks. |
+| `learning_demo/` | Earlier teaching version, kept separate from the actual engine. It has its own README. |
+| `E030-ECE-055-sample-data/` | Supplied input pack and its specification README. The nested folder contains `commands.txt` and the four input CSVs. |
+| `E030-ECE-055-sample-data/E030-ECE-055-sample-data/output/` | Reports written by the actual engine using the default command file. |
 
-Phase 3 will add the required credit-note, pickup-schedule, and monthly-summary report files. Phase 4 will compare those files against the official expected outputs when they are provided, address discrepancies, and prepare final submission documentation. The current sample pack does not include official expected-output files, so current run totals are not a claim of matching hidden evaluation results.
-
-The separate `learning_demo/` can generate example output CSVs, but those are demo results and are not official expected answers. Its own README explains how to run it.
+The supplied input files are not edited by the program. The report files are generated under the pack’s `output/` folder.
 
 ## Run the actual engine
 
-Use Python 3.10 or later. Open PowerShell in the repository root and run:
+Open PowerShell in the repository root and run:
 
 ```powershell
 python -m e_waste_engine.main
 ```
 
-The default command path points to the supplied sample pack. To choose another command file:
+Python 3.10 or later is required. The default command file is:
+
+```text
+E030-ECE-055-sample-data/E030-ECE-055-sample-data/commands.txt
+```
+
+To use a different command file:
 
 ```powershell
 python -m e_waste_engine.main --commands "path/to/commands.txt"
 ```
 
-The command file determines which CSVs are loaded and when requests are processed. The engine prints loading progress, scheduled/refused totals, vehicle-day count, and a highest-load-day snapshot. At this phase it does not write the three final report files yet.
+The command file lists the input files and commands in execution order. File paths in it are resolved relative to the folder containing that command file. The program prints concise loading and processing progress, followed by the paths of the three reports.
 
-## Suggested study order
+## Generated reports
 
-1. Read this README and the support pack README to understand the requirements and input format.
-2. Read `e_waste_engine/models.py` to see the records passed between modules.
-3. Read `e_waste_engine/main.py` to follow command parsing and CSV loading.
-4. Read `e_waste_engine/engine.py` to follow money calculations and scheduling decisions.
-5. Use `e_waste_engine/phase_2_guide.md` as a map to the important functions.
+The default run creates:
 
-The learning demo is a separate implementation with its own [README](learning_demo/README.md), generated report examples, and suggested reading order.
+- `credit_notes.csv` — one row per request in request order. Refused requests have reason codes and `NONE` in money and pickup-date fields.
+- `pickup_schedule.csv` — one row per accepted request, ordered by pickup date and request order; includes stop number and running day totals.
+- `monthly_summary.csv` — one row per source with a scheduled pickup during the month requested by `MONTHLY_SUMMARY`; includes collected weight, credit/payable totals, and certificate status.
+
+Column names and order follow the supplied pack README. The command in the sample pack asks for October 2026.
+
+## How to understand the code
+
+Suggested learning path:
+
+1. Read the sample-pack README for input fields, output columns, and planted scenarios.
+2. Read `e_waste_engine/models.py`. These dataclasses are the shapes of the information passed between program parts.
+3. Read `e_waste_engine/main.py`. Follow `main()` as it reads one command at a time. The `load_*` functions convert CSV rows into records and catch malformed references.
+4. Read `e_waste_engine/engine.py`. `calculate_money()` applies rates, deductions, pickup charges, and rounding. `schedule_one()` first handles refusals, then checks all three vehicle limits together for each candidate day. `process()` preserves request order.
+5. Read `e_waste_engine/reports.py`. Each report function turns the in-memory results into rows with the required fields and ordering.
+6. Run the program and inspect the CSV headers and a few planted examples from the pack README.
+7. Read `learning_demo/README.md` for the earlier guided implementation and its input-to-code mapping. It is a learning aid, separate from the actual engine.
+
+### Scheduling both capacity limits
+
+For each candidate day, the scheduler checks this combined condition before assigning a request:
+
+```text
+stops after adding request <= 8
+AND total kg after adding request <= 1,200
+AND hazardous kg after adding request <= 300
+```
+
+If any check fails, it tries the next Monday–Saturday vehicle day. This is why a request can move to a later day even if the vehicle still has total-weight room: hazardous capacity or stop capacity may be full.
+
+## Phase 4 validation and limits
+
+The program has been run against the supplied pack and its output files inspected for the specified headers, column order, and sample scenarios. The run loaded 20 sources, 5 categories, 45 requests, and 80 item lines; it scheduled 43 requests, refused 2, and used 21 vehicle days. The 2026-10-14 schedule reaches exactly 8 stops and 1,200 kg. The monthly report shows SRC-01 at 500 kg with a certificate.
+
+The pack does **not** contain official expected-output CSVs. Therefore, this project has been checked against the written requirements and planted examples, but an exact field-by-field match to the instructor’s hidden evaluation set cannot be claimed. When expected files are provided, compare each generated CSV field by field and resolve any differences before submission.
+
+## Current scope
+
+This implementation follows the supplied one-vehicle rules. Optional multiple-vehicle support and EPR-style category tonnage reports are not included. Shared neighborhood collection points are also outside the supplied input model; the engine treats each registered household request separately.

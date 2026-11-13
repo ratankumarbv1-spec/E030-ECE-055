@@ -131,7 +131,7 @@ def main():
     pack_dir = command_file.parent
     sources = rates = requests = results = days = None
     report_commands_seen = False
-    print("ECE-055 E-WASTE ENGINE | PHASE 3")
+    print("ECE-055 ELECTRONIC E-WASTE COLLECTION & RECYCLING ENGINE")
     output_dir = command_file.parent / "output"
     try:
         for line_no, raw in enumerate(command_file.read_text(encoding="utf-8-sig").splitlines(), 1):
@@ -185,7 +185,8 @@ def main():
     except (OSError, InputProblem, KeyError, IndexError) as exc:
         print(f"\nINPUT ERROR\n{exc}")
         return 2
-    print("Phase 3 complete. Reports are in the sample pack's output folder.")
+    print("\nProcessing completed successfully.")
+    print("Reports saved to the sample pack's output folder.")
     return 0
 
 
