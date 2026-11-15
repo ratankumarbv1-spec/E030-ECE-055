@@ -33,6 +33,8 @@ For example, suppose a household request contains a computer, cable, and battery
 | `e_waste_engine/engine.py` | Calculates money and hazardous weight; applies refusal rules; schedules requests. |
 | `e_waste_engine/reports.py` | Writes credit notes, pickup schedule, and monthly summary CSVs. |
 | `e_waste_engine/phase_2_guide.md` | Additional code walkthrough and key code landmarks. |
+| `docs/` | Final submission documents, including the design PDF and decision log (to be added). |
+| `tests/` | Automated rule tests (to be added). |
 | `learning_demo/` | Earlier teaching version, kept separate from the actual engine. It has its own README. |
 | `E030-ECE-055-sample-data/` | Supplied input pack and its specification README. The nested folder contains `commands.txt` and the four input CSVs. |
 | `E030-ECE-055-sample-data/E030-ECE-055-sample-data/output/` | Reports written by the actual engine using the default command file. |
@@ -100,6 +102,22 @@ If any check fails, it tries the next Monday–Saturday vehicle day. This is why
 The program has been run against the supplied pack and its output files inspected for the specified headers, column order, and sample scenarios. The run loaded 20 sources, 5 categories, 45 requests, and 80 item lines; it scheduled 43 requests, refused 2, and used 21 vehicle days. The 2026-10-14 schedule reaches exactly 8 stops and 1,200 kg. The monthly report shows SRC-01 at 500 kg with a certificate.
 
 The pack does **not** contain official expected-output CSVs. Therefore, this project has been checked against the written requirements and planted examples, but an exact field-by-field match to the instructor’s hidden evaluation set cannot be claimed. When expected files are provided, compare each generated CSV field by field and resolve any differences before submission.
+
+## Final submission checklist
+
+The support team requested these items in the repository:
+
+| Required item | Location / status |
+| --- | --- |
+| README with project explanation and run instructions | This file |
+| Design document PDF with BR-01 onward | `docs/design_document.pdf` — to be added |
+| Test suite | `tests/` — to be added; run instructions will be added here after implementation |
+| Decision log | `docs/decision_log.md` — to be added |
+| Five-minute demo video link | Add the shareable video URL below after recording and uploading |
+
+**Demo video:** `[Add your uploaded 5-minute demo video link here]`
+
+For the video, show the command `python -m e_waste_engine.main`, briefly explain how a request is priced and scheduled, and open the generated reports. Make sure the video link permissions allow the support team to view it.
 
 ## Current scope
 
