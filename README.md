@@ -33,8 +33,11 @@ For example, suppose a household request contains a computer, cable, and battery
 | `e_waste_engine/engine.py` | Calculates money and hazardous weight; applies refusal rules; schedules requests. |
 | `e_waste_engine/reports.py` | Writes credit notes, pickup schedule, and monthly summary CSVs. |
 | `e_waste_engine/phase_2_guide.md` | Additional code walkthrough and key code landmarks. |
-| `docs/` | Final submission documents, including the design PDF and decision log (to be added). |
-| `tests/` | Automated rule tests (to be added). |
+| `output/pdf/` | Final design-document PDF. |
+| `output/test_evidence/` | Screenshot evidence showing the passing test-suite run. |
+| `output/reports/` | Organized presentation copies of the three engine reports (to be added when selected/provided). |
+| `docs/decision_log.md` | Record of key project decisions, reasons, and effects. |
+| `tests/test_engine.py` | Automated rule-focused unit tests. |
 | `learning_demo/` | Earlier teaching version, kept separate from the actual engine. It has its own README. |
 | `E030-ECE-055-sample-data/` | Supplied input pack and its specification README. The nested folder contains `commands.txt` and the four input CSVs. |
 | `E030-ECE-055-sample-data/E030-ECE-055-sample-data/output/` | Reports written by the actual engine using the default command file. |
@@ -73,6 +76,33 @@ The default run creates:
 
 Column names and order follow the supplied pack README. The command in the sample pack asks for October 2026.
 
+## Run the test suite
+
+From the repository root, run:
+
+```powershell
+python -m unittest discover -s tests -v
+```
+
+The suite uses Python's built-in `unittest` framework, so no extra test package is needed. It checks pickup-charge boundaries, household minimum behavior, hazardous-item pricing, hazard and stop capacity, and Sunday scheduling. Each test uses small in-memory examples so its setup and expected result are easy to follow.
+
+### Test run evidence
+
+The screenshot below records a successful run of all 10 tests. The automated test suite itself is `tests/test_engine.py`; the image is supporting evidence, not a replacement for executable tests.
+
+![All 10 engine tests passing](output/test_evidence/test_suite_pass.png)
+
+## Report output organization
+
+The supplied spreadsheet screenshots are saved in `output/reports/` in this order as visual previews:
+
+1. `01_credit_notes_preview.png` — screenshot of credit notes.
+2. `02_pickup_schedule_preview.png` — screenshot of the pickup schedule.
+3. `03_monthly_summary_preview.png` — screenshot of the monthly summary.
+4. `04_engine_terminal_run.png` — screenshot showing the engine run and report generation.
+
+These images are visual evidence, not CSV data files. The engine-generated CSV reports remain at `E030-ECE-055-sample-data/E030-ECE-055-sample-data/output/` and are the machine-readable project outputs.
+
 ## How to understand the code
 
 Suggested learning path:
@@ -110,9 +140,9 @@ The support team requested these items in the repository:
 | Required item | Location / status |
 | --- | --- |
 | README with project explanation and run instructions | This file |
-| Design document PDF with BR-01 onward | `docs/design_document.pdf` — to be added |
-| Test suite | `tests/` — to be added; run instructions will be added here after implementation |
-| Decision log | `docs/decision_log.md` — to be added |
+| Design document PDF with BR-01 onward | Present in the repository at [`output/pdf/ece_055_design_document.pdf`](output/pdf/ece_055_design_document.pdf). |
+| Test suite | `tests/test_engine.py`; run with `python -m unittest discover -s tests -v` |
+| Decision log | Present at `docs/decision_log.md` |
 | Five-minute demo video link | Add the shareable video URL below after recording and uploading |
 
 **Demo video:** `[Add your uploaded 5-minute demo video link here]`
