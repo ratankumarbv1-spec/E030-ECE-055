@@ -143,11 +143,11 @@ The support team requested these items in the repository:
 | Design document PDF with BR-01 onward | Present in the repository at [`output/pdf/ece_055_design_document.pdf`](output/pdf/ece_055_design_document.pdf). |
 | Test suite | `tests/test_engine.py`; run with `python -m unittest discover -s tests -v` |
 | Decision log | Present at `docs/decision_log.md` |
-| Five-minute demo video link | Add the shareable video URL below after recording and uploading |
+| Five-minute demo video | Included in `docs/demo_video/` and linked below |
 
-**Demo video:** `[Add your uploaded 5-minute demo video link here]`
+**Demo video:** [Watch the five-minute project demo](<docs/demo_video/Screen Recording 2026-11-15 135659.mp4>)
 
-For the video, show the command `python -m e_waste_engine.main`, briefly explain how a request is priced and scheduled, and open the generated reports. Make sure the video link permissions allow the support team to view it.
+The MP4 is included in this repository, so viewers can open or download it from GitHub. The file is approximately 98.6 MB.
 
 ## Current scope
 
